@@ -70,6 +70,7 @@ seuratBoxPlot <- function(seur,
 
   if (length(features > 1)) {
     gridExtra::grid.arrange(grobs = grobs, ncol = ncol)
+    # return(grobs)
   } else {
     p
   }
