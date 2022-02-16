@@ -53,12 +53,17 @@ seuratBoxPlot <- function(seur,
       geom_boxplot(outlier.alpha = 0) +
       geom_jitter(size = ifelse(pt.size<=0, -1, pt.size), alpha = pt.alpha) +
       theme_white_bg() +
-      theme(axis.text.x = ifelse(remove_x_text, element_blank(), element_text(angle = 45, hjust = 1, size = 10, colour = "black")),
-            plot.title = element_text(face="bold")) +
+      theme(plot.title = element_text(face="bold")) +
       labs(y = f, title = f)
 
     if (remove_legend) {
       p <- p + theme(legend.position = "none")
+    }
+
+    if (remove_x_text){
+      p <- p + theme(axis.text.x = element_blank())
+    } else {
+      p <- p + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10, colour = "black"))
     }
     grobs[[f]] <- p
   }
@@ -66,8 +71,8 @@ seuratBoxPlot <- function(seur,
   if (length(features > 1)) {
     gridExtra::grid.arrange(grobs = grobs, ncol = ncol)
   } else {
-      p
-    }
+    p
+  }
 }
 
 
