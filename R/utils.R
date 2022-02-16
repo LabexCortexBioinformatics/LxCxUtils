@@ -1,4 +1,3 @@
-
 #' Compute the explained variance
 #'
 #' This function uses the standard deviation and the total variance
@@ -19,4 +18,29 @@ varianceExplained <- function(seur, reduction_name = "pca") {
   varExplained <- eigValues/total_var
   seur@reductions[[reduction_name]]@misc$variance_explained <- varExplained
   return(seur)
+}
+
+#' Count the number of cells
+#'
+#'
+#'
+#' @param seur Seurat object to use.
+#' @param features Features to use.
+#' @param group.by
+#' @param assay
+#' @param slot
+#' @param min_exp
+#'
+#' @return
+#' @export
+#'
+#' @examples
+howManyCells <- function(seur,
+                         features,
+                         group.by = NULL,
+                         assay = "RNA",
+                         slot = "data",
+                         min_exp = 1,
+                         ident){
+
 }

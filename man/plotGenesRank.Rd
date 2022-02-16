@@ -29,7 +29,7 @@ If some genes are not found in the dataset, they will just not be plotted.}
 are log1p normalized, and thus will exp1p them before getting the average expression.
 Default to "data"}
 
-\item{colmap}{colmap to use for each ident. Default tu hue_pal()}
+\item{colmap}{colmap to use for each ident. Default to hue_pal()}
 
 \item{nudge_x}{either a number or "middle". Will nudge the gene name
 on the right if positive and left if negative.

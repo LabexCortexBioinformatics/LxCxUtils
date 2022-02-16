@@ -11,6 +11,7 @@ theme_white_bg <- function(){
 }
 
 #' ## Boxplot Function
+#'
 #' This function aims at replacing the VlnPlot function from Seurat with box plots.
 #'
 #' @param seur The Seurat object within which the data will be fetched.
@@ -27,6 +28,7 @@ theme_white_bg <- function(){
 #' @param pt.alpha Transparency of the points.
 #'     Either set this to 0 or pt.size to 0 to remove points. Default to 1
 #' @param remove_legend Whether to remove the color legend. Default to FALSE
+#' @param remove_x_text Whether to remove x-axis legend. Default to FALSE
 #'
 #' @return A gridExtra object containing as much plots as there are elements in the `features` parameter.
 #'     If there is only one feature, it will return the ggplot object.
@@ -39,7 +41,8 @@ seuratBoxPlot <- function(seur,
                     ncol = 2,
                     pt.size = 1,
                     pt.alpha = 1,
-                    remove_legend = TRUE) {
+                    remove_legend = FALSE,
+                    remove_x_text = FALSE) {
 
   DefaultAssay(seur) <- assay
   plot_data <- FetchData(seur, vars = c(features, group.by), slot = slot)
@@ -50,7 +53,7 @@ seuratBoxPlot <- function(seur,
       geom_boxplot(outlier.alpha = 0) +
       geom_jitter(size = ifelse(pt.size<=0, -1, pt.size), alpha = pt.alpha) +
       theme_white_bg() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10, colour = "black"),
+      theme(axis.text.x = ifelse(remove_x_text, element_blank(), element_text(angle = 45, hjust = 1, size = 10, colour = "black")),
             plot.title = element_text(face="bold")) +
       labs(y = f, title = f)
 
@@ -134,7 +137,7 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
 #' @param slot slot to take the data from. Using data will assume that the data
 #' are log1p normalized, and thus will exp1p them before getting the average expression.
 #' Default to "data"
-#' @param colmap colmap to use for each ident. Default tu hue_pal()
+#' @param colmap colmap to use for each ident. Default to hue_pal()
 #' @param nudge_x either a number or "middle". Will nudge the gene name
 #' on the right if positive and left if negative.
 #' Middle will try to align the gene names in the middle. Default to 2
@@ -144,7 +147,15 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
 #' @return a ggplot object if only one ident, or a gridExtra object if more than one ident.
 #' @export
 #'
-plotGenesRank <- function(seur, genes_highlight, group.by = "orig.ident", assay = "RNA", slot = "data", colmap = FALSE, nudge_x = "middle", ncol = 2){
+plotGenesRank <- function(seur,
+                          genes_highlight,
+                          group.by = "orig.ident",
+                          assay = "RNA",
+                          slot = "data",
+                          colmap = FALSE,
+                          nudge_x = "middle",
+                          ncol = 2){
+
   suppressMessages(avg_exp <- as.data.frame(AverageExpression(seur, assays = assay, slot = slot, group.by = group.by)[[assay]]))
 
   if (is.factor(seur@meta.data[[group.by]])) {
@@ -207,6 +218,80 @@ plotGenesRank <- function(seur, genes_highlight, group.by = "orig.ident", assay 
   if (length(ps)>1){
     gridExtra::grid.arrange(grobs = ps, ncol = 2)
   } else {ps[[1]]}
+}
+
+#' Compute multiple UMAPs
+#'
+#' Will compute multiple umaps, and aggregate their dimplots in one plot.
+#' This plot can then be returned or saved as image (or both).
+#'
+#' @param seur Seurat object to use.
+#' @param dims Dimensions to use. Must be an integer vector or list.
+#' Can be cast with a range, for example 5:10 will compute UMAPs 5, 6, 7, 8, 9, 10.
+#' @param out Whether to return the aggregated plot. Default to TRUE
+#' @param save Whether to save the aggregated plot. Default to FALSE
+#' @param add_to_object Whether to add every UMAP computed in the object.
+#' If TRUE, the UMAPs will be saved under "UMAP_dim" followed by the dimnesion
+#' (for exemple "UMAP_dim5" for dimension 5). If FALSE, the UMAPs will be
+#' computed under "temp" and then suppressed. Default to FALSE
+#' @param ncol Number of columns in the aggregated plot. Default to 3
+#' @param pt_size Size of points to use. Default to 0.5
+#' @param file The file name and path if image is saved. Default to working_directory/multiUMAP.png
+#' @param fig_size The size of the saved image. Either "auto", which will try to use the best image size automatically,
+#' or a vector of int, the first one being the width in pixel and second one the height in pixel.
+#' Default is "auto"
+#' @param dpi The dpi of the saved image. Must be an int. Default to 200
+#' @param save_as The type of file to save. Default to "png"
+#' @param verbose Default to TRUE
+#'
+#' @return a gridExtra object if TRUE, else nothing
+#' @export
+multiUMAP <- function(seur,
+                      dims,
+                      out = TRUE,
+                      save = FALSE,
+                      add_to_object = FALSE,
+                      ncol = 3,
+                      pt_size = 0.5,
+                      file = paste0(getwd(),"/multiUMAP"),
+                      fig_size = "auto",
+                      dpi = 200,
+                      save_as = "png",
+                      verbose = TRUE){
+  p <- lapply(dims, function(d){
+    if (verbose){
+      print(paste0("Computing dimension ", d)) # print current dimension
+    }
+    name = ifelse(add_to_object, paste0("UMAP_dim", d), "temp")
+    seur <- RunUMAP(seur, dims = 1:d, verbose = FALSE, reduction.name = name) # run umap using current dimension
+    p1 <- DimPlot(seur, label = TRUE, pt.size = pt_size, reduction = name) + NoLegend() + ggtitle(paste0("dimension ", d)) # Generate DimPlot using umap with current dim
+    p1
+  })
+
+  if (!add_to_object){
+    seur@reductions$temp <- NULL
+  }
+
+  if (fig_size == "auto"){
+    w = round(10*dpi*ncol/3)
+    h = round(.9*ceiling(length(dims)/ncol)*w / ncol)
+  } else {
+    w = fig_size[1]
+    h = fig_size[2]
+  }
+
+  p_out <- gridExtra::arrangeGrob(grobs = p, ncol = ncol)
+  if (save){
+    if (verbose){
+      print("Saving image")
+    }
+    ggsave(filename = paste(file, save_as, sep = "."),
+           plot = p_out, device = save_as,
+           width = w, height = h, units = "px", dpi = dpi, limitsize = h<4800 & w<4800)
+  }
+
+  if (out){return(p_out)}
+
 }
 
 

@@ -3,8 +3,6 @@
 \name{seuratBoxPlot}
 \alias{seuratBoxPlot}
 \title{\subsection{Boxplot Function}{
-
-This function aims at replacing the VlnPlot function from Seurat with box plots.
 }}
 \usage{
 seuratBoxPlot(
@@ -16,7 +14,8 @@ seuratBoxPlot(
   ncol = 2,
   pt.size = 1,
   pt.alpha = 1,
-  remove_legend = TRUE
+  remove_legend = FALSE,
+  remove_x_text = FALSE
 )
 }
 \arguments{
@@ -42,14 +41,13 @@ Either set this to 0 or pt.alpha to 0 to remove points. Default to 1}
 Either set this to 0 or pt.size to 0 to remove points. Default to 1}
 
 \item{remove_legend}{Whether to remove the color legend. Default to FALSE}
+
+\item{remove_x_text}{Whether to remove x-axis legend. Default to FALSE}
 }
 \value{
 A gridExtra object containing as much plots as there are elements in the \code{features} parameter.
 If there is only one feature, it will return the ggplot object.
 }
 \description{
-\subsection{Boxplot Function}{
-
 This function aims at replacing the VlnPlot function from Seurat with box plots.
-}
 }
