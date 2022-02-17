@@ -49,12 +49,13 @@ seuratBoxPlot <- function(seur,
   grobs <- list()
 
   for (f in features) {
-    p <- ggplot(plot_data, aes(x = .data[[group.by]], y = .data[[f]], fill = .data[[group.by]])) +
+    name <- grep(f, colnames(plot_data), value = TRUE)[1]
+    p <- ggplot(plot_data, aes(x = .data[[group.by]], y = .data[[name]], fill = .data[[group.by]])) +
       geom_boxplot(outlier.alpha = 0) +
       geom_jitter(size = ifelse(pt.size<=0, -1, pt.size), alpha = pt.alpha) +
       theme_white_bg() +
       theme(plot.title = element_text(face="bold")) +
-      labs(y = f, title = f)
+      labs(y = f, title = name)
 
     if (remove_legend) {
       p <- p + theme(legend.position = "none")
