@@ -7,7 +7,8 @@ library(ggplot2)
 #' @return ggplot2 theme
 theme_white_bg <- function(){
   theme(panel.background = element_blank(),
-                 axis.line = element_line())
+                 axis.line = element_line(),
+        )
 }
 
 #' ## Boxplot Function
@@ -39,13 +40,19 @@ seuratBoxPlot <- function(seur,
                     assay = "RNA",
                     slot = "data",
                     ncol = 2,
+                    cols = NULL,
                     pt.size = 1,
                     pt.alpha = 1,
                     remove_legend = FALSE,
                     remove_x_text = FALSE) {
 
+  temp <- DefaultAssay(seur)
   DefaultAssay(seur) <- assay
   plot_data <- FetchData(seur, vars = c(features, group.by), slot = slot)
+  DefaultAssay(seur) <- temp
+
+  cols <- setCols(cols, plot_data[,group.by])
+
   grobs <- list()
 
   for (f in features) {
@@ -53,6 +60,7 @@ seuratBoxPlot <- function(seur,
     p <- ggplot(plot_data, aes(x = .data[[group.by]], y = .data[[name]], fill = .data[[group.by]])) +
       geom_boxplot(outlier.alpha = 0) +
       geom_jitter(size = ifelse(pt.size<=0, -1, pt.size), alpha = pt.alpha) +
+      scale_fill_manual(values = cols) +
       theme_white_bg() +
       theme(plot.title = element_text(face="bold")) +
       labs(y = f, title = name)
@@ -159,7 +167,7 @@ plotGenesRank <- function(seur,
                           group.by = "orig.ident",
                           assay = "RNA",
                           slot = "data",
-                          colmap = FALSE,
+                          cols = NULL,
                           nudge_x = "middle",
                           ncol = 2){
 
@@ -175,12 +183,7 @@ plotGenesRank <- function(seur,
     colnames(avg_exp) <- vars
   }
 
-  if (colmap == FALSE) {
-    colmap = scales::hue_pal()(ncol(avg_exp))
-    names(colmap) <- colnames(avg_exp)
-  } else if (is.null(names(colmap))) {
-    names(colmap) <- colnames(avg_exp)
-  }
+  colmap = setCols(cols, colnames(avg_exp))
   avg_exp$names = ifelse(row.names(avg_exp) %in% genes_highlight, row.names(avg_exp), '')
 
   ps <- lapply(vars, FUN = function(x){
@@ -298,7 +301,60 @@ multiUMAP <- function(seur,
   }
 
   if (out){return(p_out)}
+}
 
+
+#' Plot features as barplot
+#'
+#' Does the same as Violin or Box plots, but as an histogram.
+#'
+#' @param seur Seurat object to fetch data from.
+#' @param features Features to use. Use nFeature_RNA, nCount_RNA, percent.mt or percent.ribo for QCs.
+#' @param group.by Which variable to group by. Default to "orig.ident"
+#' @param cols Which colors to use. NULL will use hue_pal. Default to NULL
+#' @param wrap Whether or not to use the facet_wrap from ggplot on the group.by groups. Default to FALSE
+#' @param assay Which assay to get data from, if features are genes. Default to "RNA"
+#' @param slot Which slot in the assay to get data from, if features are genes. Default to "data"
+#' @param bins Number of bins to use. A high number will have better precision. Default to 100
+#' @param ncol Number of column if several features. Default to 2
+#'
+#' @return A gridExtra object if several features, or a ggplot object if only one feature.
+#' @export
+QC_barplot <- function(seur,
+                       features,
+                       group.by = "orig.ident",
+                       cols = NULL,
+                       wrap = FALSE,
+                       assay = "RNA",
+                       slot = "data",
+                       bins = 100,
+                       ncol = 2){
+
+  temp <- DefaultAssay(seur)
+  DefaultAssay(seur) <- assay
+  plot_data <- FetchData(seur, vars = c(features, group.by), slot = slot)
+  DefaultAssay(seur) <- temp
+
+  cols <- setCols(cols, plot_data[,group.by])
+
+  grobs <- list()
+  for (f in features) {
+    name <- grep(f, colnames(plot_data), value = TRUE)[1]
+    p <- ggplot(plot_data, aes(x = .data[[name]], fill = .data[[group.by]])) +
+      geom_histogram(bins = bins) +
+      theme_bw() +
+      scale_fill_manual(values = cols) +
+      ggtitle(paste0("Distribution of ", f, " across cells")) +
+      xlab("Number of cells")
+
+    if (wrap){
+      p <- p + facet_wrap(~.data[[group.by]])
+    }
+    grobs[[f]] <- p
+  }
+  if (length(features)>1){
+    return(gridExtra::grid.arrange(grobs = grobs, ncol = 2))
+  } else {return(p)}
 }
 
 
