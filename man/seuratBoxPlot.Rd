@@ -12,6 +12,7 @@ seuratBoxPlot(
   assay = "RNA",
   slot = "data",
   ncol = 2,
+  cols = NULL,
   pt.size = 1,
   pt.alpha = 1,
   remove_legend = FALSE,

@@ -163,7 +163,7 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
 #' @export
 #'
 plotGenesRank <- function(seur,
-                          genes_highlight,
+                          genes_highlight = c(),
                           group.by = "orig.ident",
                           assay = "RNA",
                           slot = "data",

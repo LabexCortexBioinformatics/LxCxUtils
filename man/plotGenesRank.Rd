@@ -6,11 +6,11 @@
 \usage{
 plotGenesRank(
   seur,
-  genes_highlight,
+  genes_highlight = c(),
   group.by = "orig.ident",
   assay = "RNA",
   slot = "data",
-  colmap = FALSE,
+  cols = NULL,
   nudge_x = "middle",
   ncol = 2
 )
@@ -29,14 +29,14 @@ If some genes are not found in the dataset, they will just not be plotted.}
 are log1p normalized, and thus will exp1p them before getting the average expression.
 Default to "data"}
 
-\item{colmap}{colmap to use for each ident. Default to hue_pal()}
-
 \item{nudge_x}{either a number or "middle". Will nudge the gene name
 on the right if positive and left if negative.
 Middle will try to align the gene names in the middle. Default to 2}
 
 \item{ncol}{number of column to plot, only useful if more than 1 ident.
 Default to 2}
+
+\item{colmap}{colmap to use for each ident. Default to hue_pal()}
 }
 \value{
 a ggplot object if only one ident, or a gridExtra object if more than one ident.
