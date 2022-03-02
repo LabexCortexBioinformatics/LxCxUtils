@@ -20,6 +20,7 @@ suppressMessages({
   library(Seurat)
   library(SeuratData)
   library(ggplot2)
+  library(viridis)
 })
 ```
 
@@ -58,11 +59,23 @@ plotGenesRank(pbmc3k, genes_highlight = c("FTL", "LYZ", "MALAT1"))
 plotGenesRank(pbmc3k, genes_highlight = c("FTL", "LYZ", "MALAT1"), group.by = "seurat_annotations")
 ```
 
+We can plot the QC as barplots with `QC_barplot`
 ```{r}
+#Grouping by default : orig.ident
 QC_barplot(pbmc3k, features = c("nFeature_RNA"))
+#Coloring by clusters
+QC_barplot(pbmc3k, features = c("nFeature_RNA"), group.by = "seurat_annotations")
 ```
 
+```{r, fig.width=10, fig.asp = .7}
+#Coloring and grouping by clusters
+QC_barplot(pbmc3k, features = c("nFeature_RNA"), group.by = "seurat_annotations", wrap = TRUE)
+```
 
-
+Another feature of the package is to compute and plot the PCA variance explained. For this we use the function `plotVarianceExplained` or `plotCumulativeVarExplained`, which respectively plot the variance for each PC, and plot the cumulative variance for each PC, that is adding the variance of all previous PC to each PC.
+```{r}
+plotVarianceExplained(pbmc3k)
+plotCumulativeVarExplained(pbmc3k)
+```
 
 

@@ -19,5 +19,6 @@ Suggests:
     rmarkdown
 Imports:
     Seurat (>= 3.0.0),
-    ggplot2
+    ggplot2,
+    viridis
 VignetteBuilder: knitr

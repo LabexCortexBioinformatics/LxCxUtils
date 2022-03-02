@@ -133,7 +133,7 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
     labs(title = "cumulative variance by PCs", x = "PC", y = "Cumulative variance") +
     theme_bw() +
     ylim(0, NA) +
-    scale_color_gradientn(colours = viridis(100, option = "B", end = 0.99, direction = 1), trans = "log10")
+    scale_color_gradientn(colours = viridis::viridis(100, option = "B", end = 0.99, direction = 1), trans = "log10")
 }
 
 
