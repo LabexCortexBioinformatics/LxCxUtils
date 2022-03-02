@@ -290,17 +290,16 @@ multiUMAP <- function(seur,
     h = fig_size[2]
   }
 
-  p_out <- gridExtra::arrangeGrob(grobs = p, ncol = ncol)
   if (save){
     if (verbose){
       print("Saving image")
     }
     ggsave(filename = paste(file, save_as, sep = "."),
-           plot = p_out, device = save_as,
+           plot = gridExtra::arrangeGrob(grobs = p, ncol = ncol), device = save_as,
            width = w, height = h, units = "px", dpi = dpi, limitsize = h<4800 & w<4800)
   }
 
-  if (out){return(p_out)}
+  if (out){return(gridExtra::arrangeGrob(grobs = p, ncol = ncol))}
 }
 
 
