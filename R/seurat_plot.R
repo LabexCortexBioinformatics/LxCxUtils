@@ -262,7 +262,7 @@ multiUMAP <- function(seur,
                       save = FALSE,
                       add_to_object = FALSE,
                       ncol = 3,
-                      pt_size = 0.5,
+                      pt.size = 0.5,
                       file = paste0(getwd(),"/multiUMAP"),
                       fig_size = "auto",
                       dpi = 200,
@@ -273,10 +273,16 @@ multiUMAP <- function(seur,
       print(paste0("Computing dimension ", d)) # print current dimension
     }
     name = ifelse(add_to_object, paste0("UMAP_dim", d), "temp")
-    seur <- RunUMAP(seur, dims = 1:d, verbose = FALSE, reduction.name = name) # run umap using current dimension
-    p1 <- DimPlot(seur, label = TRUE, pt.size = pt_size, reduction = name) + NoLegend() + ggtitle(paste0("dimension ", d)) # Generate DimPlot using umap with current dim
+    seur <- RunUMAP(seur, dims = 1:d, verbose = FALSE, reduction.name = name, reduction.key = paste0(name, "_")) # run umap using current dimension
+    # plot_data <- as.data.frame(seur@reductions[[name]]@cell.embeddings)
+    # plot_data$ident <- Idents(seur)
+    # p1 <- ggplot(plot_data, aes(x = .data[[paste0(name, "_1")]], y = .data[[paste0(name, "_2")]], color = ident)) +
+    #   geom_point(size = pt.size) +
+    #   scale_color_manual(values = setCols(NULL, plot_data$ident))
+    p1 <- DimPlot(seur, label = TRUE, pt.size = pt.size, reduction = name) + NoLegend() + ggtitle(paste0("dimension ", d)) # Generate DimPlot using umap with current dim
     p1
   })
+  # return(p)
 
   if (!add_to_object){
     seur@reductions$temp <- NULL
@@ -291,15 +297,18 @@ multiUMAP <- function(seur,
   }
 
   if (save){
+    p_out <- gridExtra::arrangeGrob(grobs = p, ncol = ncol)
     if (verbose){
       print("Saving image")
     }
     ggsave(filename = paste(file, save_as, sep = "."),
-           plot = gridExtra::arrangeGrob(grobs = p, ncol = ncol), device = save_as,
+           plot = p_out, device = save_as,
            width = w, height = h, units = "px", dpi = dpi, limitsize = h<4800 & w<4800)
   }
 
-  if (out){return(gridExtra::arrangeGrob(grobs = p, ncol = ncol))}
+  if (out){
+    gridExtra::grid.arrange(grobs = p, ncol = ncol)
+  }
 }
 
 
