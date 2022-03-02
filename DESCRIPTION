@@ -17,7 +17,7 @@ RoxygenNote: 7.1.2
 Suggests: 
     knitr,
     rmarkdown
-Imports:
+Depends:
     Seurat (>= 3.0.0),
     ggplot2,
     viridis
