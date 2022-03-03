@@ -353,7 +353,8 @@ QC_barplot <- function(seur,
       theme_bw() +
       scale_fill_manual(values = cols) +
       ggtitle(paste0("Distribution of ", f, " across cells")) +
-      xlab("Number of cells")
+      ylab("Number of cells") +
+      xlab(f)
 
     if (wrap){
       p <- p + facet_wrap(~.data[[group.by]])
