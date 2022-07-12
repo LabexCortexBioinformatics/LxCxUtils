@@ -148,6 +148,7 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
 #' @param genes_highlight List of genes to highlight.
 #' If some genes are not found in the dataset, they will just not be plotted.
 #' @param group.by Which ident to group the data by. Default to "orig.ident".
+#' Can also be "All cells" to get every cells in the same plot.
 #' @param assay Assay to use. Default to "RNA"
 #' @param slot slot to take the data from. Using data will assume that the data
 #' are log1p normalized, and thus will exp1p them before getting the average expression.
@@ -158,6 +159,10 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
 #' Middle will try to align the gene names in the middle. Default to 2
 #' @param ncol number of column to plot, only useful if more than 1 ident.
 #' Default to 2
+#' @param write_name Whether to write the gene names or not
+#' @param point_size The size of the points. Default to 2
+#' @param return_table return a data frame containing the data used for the plot.
+#' Only works with group.by = "All cells"
 #'
 #' @return a ggplot object if only one ident, or a gridExtra object if more than one ident.
 #' @export
@@ -170,9 +175,11 @@ plotGenesRank <- function(seur,
                           cols = NULL,
                           nudge_x = "middle",
                           ncol = 2,
+                          # Add a mean to write the name of only the top X genes by expression in genes_highlight
                           write_name = TRUE,
-                          point_size = 1){
-
+                          point_size = 2,
+                          return_table = FALSE){
+  if (group.by == "All cells"){seur@meta.data[["All cells"]] = "all cells"}
   suppressMessages(avg_exp <- as.data.frame(AverageExpression(seur, assays = assay, slot = slot, group.by = group.by)[[assay]]))
 
   if (is.factor(seur@meta.data[[group.by]])) {
@@ -188,7 +195,7 @@ plotGenesRank <- function(seur,
   colmap = setCols(cols, colnames(avg_exp))
   avg_exp$names = ifelse(row.names(avg_exp) %in% genes_highlight, row.names(avg_exp), '')
 
-  ps <- lapply(vars, FUN = function(x){
+  pl <- function(x){
     avg_id <- avg_exp[order(avg_exp[[x]], decreasing = F),]
     avg_id$x <- 1:nrow(avg_id)
     avg_id1 <- subset(avg_id, avg_id$names == '')
@@ -226,10 +233,26 @@ plotGenesRank <- function(seur,
                                         direction = "y")
     }
     return(p)
-  })
-  if (length(ps)>1){
-    gridExtra::grid.arrange(grobs = ps, ncol = 2)
-  } else {ps[[1]]}
+  }
+  if (group.by == "All cells"){
+    avg_id <- avg_exp[order(avg_exp[[vars]], decreasing = F),]
+    avg_id$x <- 1:nrow(avg_id)
+    ps <- pl(vars)
+    if (return_table){
+      print(ps)
+      colnames(avg_id) <- c("average expression", "genes highlighted", "rank")
+      avg_id[["gene name"]] <- row.names(avg_id)
+      return(avg_id)
+    }
+  }
+  else {
+    ps <- lapply(vars, FUN = pl)
+    if (length(ps)>1){
+      gridExtra::grid.arrange(grobs = ps, ncol = 2)
+    } else {ps[[1]]}
+  }
+
+
 }
 
 #' Compute multiple UMAPs
