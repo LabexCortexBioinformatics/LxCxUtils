@@ -170,7 +170,8 @@ plotGenesRank <- function(seur,
                           cols = NULL,
                           nudge_x = "middle",
                           ncol = 2,
-                          write_name = TRUE){
+                          write_name = TRUE,
+                          point_size = 1){
 
   suppressMessages(avg_exp <- as.data.frame(AverageExpression(seur, assays = assay, slot = slot, group.by = group.by)[[assay]]))
 
@@ -194,8 +195,8 @@ plotGenesRank <- function(seur,
     avg_id2 <- subset(avg_id, avg_id$names != '')
 
     p <- ggplot(avg_id1, aes(x = x, y = .data[[x]])) +
-      geom_point(colour = colmap[x], shape = 19) +
-      geom_point(data = avg_id2, colour = "black", fill = colmap[x], shape = 21) +
+      geom_point(colour = colmap[x], shape = 19, size = point_size) +
+      geom_point(data = avg_id2, colour = "black", fill = colmap[x], shape = 21, size = point_size) +
       scale_y_continuous(trans = "log1p") +
       ggtitle(x) +
       labs(y = "Average expression normalized") +
