@@ -178,9 +178,11 @@ plotGenesRank <- function(seur,
                           # Add a mean to write the name of only the top X genes by expression in genes_highlight
                           write_name = TRUE,
                           point_size = 2,
-                          return_table = FALSE){
+                          return_table = FALSE
+                          # Add argument
+                          ){
   if (group.by == "All cells"){seur@meta.data[["All cells"]] = "all cells"}
-  suppressMessages(avg_exp <- as.data.frame(AverageExpression(seur, assays = assay, slot = slot, group.by = group.by)[[assay]]))
+  suppressMessages(avg_exp <- as.data.frame(AverageExpression(seur, assays = assay, slot = slot, group.by = group.by, )[[assay]]))
 
   if (is.factor(seur@meta.data[[group.by]])) {
     vars = levels(seur@meta.data[[group.by]])
@@ -206,7 +208,7 @@ plotGenesRank <- function(seur,
       geom_point(data = avg_id2, colour = "black", fill = colmap[x], shape = 21, size = point_size) +
       scale_y_continuous(trans = "log1p") +
       ggtitle(x) +
-      labs(y = "Average expression normalized") +
+      labs(y = "Normalized counts") +
       theme(axis.title.x = element_blank(),
             axis.line = element_line(),
             panel.background=element_blank())
