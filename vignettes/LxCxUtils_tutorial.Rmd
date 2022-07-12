@@ -1,5 +1,7 @@
 ---
-title: "LxCxUtils_tutorial"
+title: "Overview of Labex Cortex bioinformatics package"
+author: "[LabEx CORTEX Bioinformatics Platform - Lyon 1 University -](https://labex-cortex.universite-lyon.fr/) <br>Vignette produced by Emeric Texeraud"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{LxCxUtils_tutorial}
@@ -19,12 +21,8 @@ suppressMessages({
   library(LxCxUtils)
   library(Seurat)
   library(SeuratData)
-  library(ggplot2)
-  library(viridis)
 })
 ```
-
-# Setup Seurat object
 
 The `LxCxUtils` package mainly uses Seurat objects to get the expression data for the plots, so we first need to setup a Seurat object. We will use the pbmc 3k dataset from the `SeuratData` package.
 ```{r}
@@ -47,26 +45,31 @@ pbmc3k <- RunPCA(pbmc3k, verbose = FALSE)
 
 
 The first visualisation function from `LxCxUtils` is the `PlotGeneRank`. This function will rank the genes by their expression in each identity of the dataset, and we can even highlight some genes of interest.
-
 ```{r}
 #highlight no genes
 plotGenesRank(pbmc3k, genes_highlight = c())
 #highlight some genes
 plotGenesRank(pbmc3k, genes_highlight = c("FTL", "LYZ", "MALAT1"))
 ```
+
+And we can separate the plots by any cluster column from the metadata.
 ```{r, fig.width=8, fig.asp = 1.8}
 #highlight some genes and separate by clusters
 plotGenesRank(pbmc3k, genes_highlight = c("FTL", "LYZ", "MALAT1"), group.by = "seurat_annotations")
 ```
 
-We can plot the QC as barplots with `QC_barplot`
+Another visualization function from the package, which can be used for the QC, is the `QC_barplot`. It will plot the distribution of cells along the QC column from the metadata, as an histogram.
 ```{r}
 #Grouping by default : orig.ident
 QC_barplot(pbmc3k, features = c("nFeature_RNA"))
+```
+
+We can color the histogram by another column from the metadata
+```{r}
 #Coloring by clusters
 QC_barplot(pbmc3k, features = c("nFeature_RNA"), group.by = "seurat_annotations")
 ```
-
+And even separate the histograms, with one for each cluster of this column.
 ```{r, fig.width=10, fig.asp = .7}
 #Coloring and grouping by clusters
 QC_barplot(pbmc3k, features = c("nFeature_RNA"), group.by = "seurat_annotations", wrap = TRUE)
@@ -77,5 +80,21 @@ Another feature of the package is to compute and plot the PCA variance explained
 plotVarianceExplained(pbmc3k)
 plotCumulativeVarExplained(pbmc3k)
 ```
+
+One of the main plotting function from this package is the `seuratBoxPlot`, which aims to complement the `VlnPlot` from Seurat with a boxplot representation.
+```{r, fig.width=12, fig.asp = .4}
+#Box plot
+p1 <- seuratBoxPlot(pbmc3k, "FTL", group.by = "seurat_annotations", pt.size = 0.1) + ggtitle("Boxplot of FTL")
+# seuratBoxPlot(pbmc3k, "FTL", group.by = "seurat_annotations", pt.size = 0.1)
+#VlnPlot from Seurat
+p2 <- VlnPlot(pbmc3k, "FTL", group.by = "seurat_annotations", pt.size = 0.1) + ggtitle("Violin plot of FTL")
+gridExtra::grid.arrange(p1,p2,ncol = 2)
+```
+
+To choose the best dimension for UMAP, the package has a function that computes all the dimension you ask, and give a plot with the umap for each of these dimensions. This function is called `multiUMAP`. 
+```{r, fig.width=12, fig.asp = 1.2}
+multiUMAP(pbmc3k, dims = 10:20, out = TRUE, save = FALSE, verbose = FALSE)
+```
+
 
 

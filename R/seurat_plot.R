@@ -169,7 +169,8 @@ plotGenesRank <- function(seur,
                           slot = "data",
                           cols = NULL,
                           nudge_x = "middle",
-                          ncol = 2){
+                          ncol = 2,
+                          write_name = TRUE){
 
   suppressMessages(avg_exp <- as.data.frame(AverageExpression(seur, assays = assay, slot = slot, group.by = group.by)[[assay]]))
 
@@ -202,7 +203,7 @@ plotGenesRank <- function(seur,
             axis.line = element_line(),
             panel.background=element_blank())
 
-    if (nudge_x == "middle") {
+    if (nudge_x == "middle" & write_name) {
       p <- p + ggrepel::geom_text_repel(data = avg_id2,
                                         aes(label=names),
                                         segment.color = 'grey70',
@@ -212,7 +213,7 @@ plotGenesRank <- function(seur,
                                         force_pull = 0.5,
                                         nudge_x = -max(avg_id$x)%/%2 + max(avg_id$x) - avg_id2$x,
                                         direction = "y")
-    } else {
+    } else if(write_name) {
       p <- p + ggrepel::geom_text_repel(data = avg_id2,
                                         aes(label=names),
                                         segment.color = 'grey70',
