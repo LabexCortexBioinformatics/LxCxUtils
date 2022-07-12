@@ -198,7 +198,7 @@ plotGenesRank <- function(seur,
   avg_exp$names = ifelse(row.names(avg_exp) %in% genes_highlight, row.names(avg_exp), '')
 
   pl <- function(x){
-    avg_id <- avg_exp[order(avg_exp[[x]], decreasing = F),]
+    avg_id <- avg_exp[order(avg_exp[[x]], decreasing = T),]
     avg_id$x <- 1:nrow(avg_id)
     avg_id1 <- subset(avg_id, avg_id$names == '')
     avg_id2 <- subset(avg_id, avg_id$names != '')
@@ -207,6 +207,7 @@ plotGenesRank <- function(seur,
       geom_point(colour = colmap[x], shape = 19, size = point_size) +
       geom_point(data = avg_id2, colour = "black", fill = colmap[x], shape = 21, size = point_size) +
       scale_y_continuous(trans = "log1p") +
+      scale_x_reverse() +
       ggtitle(x) +
       labs(y = "Normalized counts") +
       theme(axis.title.x = element_blank(),
