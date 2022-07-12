@@ -210,8 +210,7 @@ plotGenesRank <- function(seur,
       scale_x_reverse() +
       ggtitle(x) +
       labs(y = "Normalized counts", x = "rank") +
-      theme(axis.title.x = element_blank(),
-            axis.line = element_line(),
+      theme(axis.line = element_line(),
             panel.background=element_blank())
 
     if (nudge_x == "middle" & write_name) {
@@ -243,7 +242,7 @@ plotGenesRank <- function(seur,
     ps <- pl(vars)
     if (return_table){
       print(ps)
-      colnames(avg_id) <- c("average expression", "genes highlighted", "rank")
+      colnames(avg_id) <- c("normalized expression", "genes highlighted", "rank")
       avg_id[["gene name"]] <- row.names(avg_id)
       return(avg_id)
     }
