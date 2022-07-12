@@ -238,7 +238,7 @@ plotGenesRank <- function(seur,
     return(p)
   }
   if (group.by == "All cells"){
-    avg_id <- avg_exp[order(avg_exp[[vars]], decreasing = F),]
+    avg_id <- avg_exp[order(avg_exp[[vars]], decreasing = T),]
     avg_id$x <- 1:nrow(avg_id)
     ps <- pl(vars)
     if (return_table){
