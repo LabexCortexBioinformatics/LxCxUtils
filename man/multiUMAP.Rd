@@ -10,8 +10,9 @@ multiUMAP(
   out = TRUE,
   save = FALSE,
   add_to_object = FALSE,
+  group.by = "ident",
   ncol = 3,
-  pt_size = 0.5,
+  pt.size = 0.5,
   file = paste0(getwd(), "/multiUMAP"),
   fig_size = "auto",
   dpi = 200,
@@ -34,9 +35,9 @@ If TRUE, the UMAPs will be saved under "UMAP_dim" followed by the dimnesion
 (for exemple "UMAP_dim5" for dimension 5). If FALSE, the UMAPs will be
 computed under "temp" and then suppressed. Default to FALSE}
 
-\item{ncol}{Number of columns in the aggregated plot. Default to 3}
+\item{group.by}{Which column of the metadata to group cells by. Default to ident, which will take the active ident.}
 
-\item{pt_size}{Size of points to use. Default to 0.5}
+\item{ncol}{Number of columns in the aggregated plot. Default to 3}
 
 \item{file}{The file name and path if image is saved. Default to working_directory/multiUMAP.png}
 
@@ -49,6 +50,8 @@ Default is "auto"}
 \item{save_as}{The type of file to save. Default to "png"}
 
 \item{verbose}{Default to TRUE}
+
+\item{pt_size}{Size of points to use. Default to 0.5}
 }
 \value{
 a gridExtra object if TRUE, else nothing

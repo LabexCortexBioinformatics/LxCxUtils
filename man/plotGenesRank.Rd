@@ -7,12 +7,15 @@
 plotGenesRank(
   seur,
   genes_highlight = c(),
-  group.by = "orig.ident",
+  group.by = "All cells",
   assay = "RNA",
   slot = "data",
   cols = NULL,
   nudge_x = "middle",
-  ncol = 2
+  ncol = 2,
+  write_name = TRUE,
+  point_size = 2,
+  return_table = FALSE
 )
 }
 \arguments{
@@ -21,7 +24,8 @@ plotGenesRank(
 \item{genes_highlight}{List of genes to highlight.
 If some genes are not found in the dataset, they will just not be plotted.}
 
-\item{group.by}{Which ident to group the data by. Default to "orig.ident".}
+\item{group.by}{Which ident to group the data by. Default to "orig.ident".
+Can also be "All cells" to get every cells in the same plot.}
 
 \item{assay}{Assay to use. Default to "RNA"}
 
@@ -35,6 +39,13 @@ Middle will try to align the gene names in the middle. Default to 2}
 
 \item{ncol}{number of column to plot, only useful if more than 1 ident.
 Default to 2}
+
+\item{write_name}{Whether to write the gene names or not}
+
+\item{point_size}{The size of the points. Default to 2}
+
+\item{return_table}{return a data frame containing the data used for the plot.
+Only works with group.by = "All cells"}
 
 \item{colmap}{colmap to use for each ident. Default to hue_pal()}
 }

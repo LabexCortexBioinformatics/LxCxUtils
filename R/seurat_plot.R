@@ -271,6 +271,7 @@ plotGenesRank <- function(seur,
 #' If TRUE, the UMAPs will be saved under "UMAP_dim" followed by the dimnesion
 #' (for exemple "UMAP_dim5" for dimension 5). If FALSE, the UMAPs will be
 #' computed under "temp" and then suppressed. Default to FALSE
+#' @param group.by Which column of the metadata to group cells by. Default to ident, which will take the active ident.
 #' @param ncol Number of columns in the aggregated plot. Default to 3
 #' @param pt_size Size of points to use. Default to 0.5
 #' @param file The file name and path if image is saved. Default to working_directory/multiUMAP.png
@@ -288,6 +289,7 @@ multiUMAP <- function(seur,
                       out = TRUE,
                       save = FALSE,
                       add_to_object = FALSE,
+                      group.by = "ident",
                       ncol = 3,
                       pt.size = 0.5,
                       file = paste0(getwd(),"/multiUMAP"),
@@ -306,7 +308,7 @@ multiUMAP <- function(seur,
     # p1 <- ggplot(plot_data, aes(x = .data[[paste0(name, "_1")]], y = .data[[paste0(name, "_2")]], color = ident)) +
     #   geom_point(size = pt.size) +
     #   scale_color_manual(values = setCols(NULL, plot_data$ident))
-    p1 <- DimPlot(seur, label = TRUE, pt.size = pt.size, reduction = name) + NoLegend() + ggtitle(paste0("dimension ", d)) # Generate DimPlot using umap with current dim
+    p1 <- DimPlot(seur, label = TRUE, pt.size = pt.size, reduction = name, group.by = group.by) + NoLegend() + ggtitle(paste0("dimension ", d)) # Generate DimPlot using umap with current dim
     p1
   })
   # return(p)
