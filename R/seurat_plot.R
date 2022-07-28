@@ -169,7 +169,7 @@ plotCumulativeVarExplained <- function(seur, npcs = 50){
 #'
 plotGenesRank <- function(seur,
                           genes_highlight = c(),
-                          group.by = "All cels",
+                          group.by = "All cells",
                           assay = "RNA",
                           slot = "data",
                           cols = NULL,
